@@ -1,13 +1,19 @@
 import { LitElement, html } from 'lit';
 import { ScopedElementsMixin } from '@open-wc/scoped-elements';
 import { property } from 'lit/decorators.js';
+import { debounce } from './utils.js';
 import { covidTrackerStyles } from './css/covid-tracker.styles';
 
 // components
 import { CountryInformationCard } from './components/country-information-card/CountryInformationCard.js';
+import { InputSearch } from './components/input-search/InputSearch.js';
 
 export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
   @property() statistics: any = [];
+
+  @property() statisticsDisplay: any = [];
+
+  @property() isGetStatisticsLoading: any = [];
 
   @property() statisticsEndpoint = '';
 
@@ -20,6 +26,7 @@ export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
   static get scopedElements() {
     return {
       'country-information-card': CountryInformationCard,
+      'input-search': InputSearch,
     };
   }
 
@@ -33,6 +40,8 @@ export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
     super();
 
     this.statistics = [];
+    this.statisticsDisplay = [];
+    this.isGetStatisticsLoading = false;
     this.statisticsEndpoint = 'https://covid-193.p.rapidapi.com/statistics';
     this.requestHeaders = {
       'x-rapidapi-host': 'covid-193.p.rapidapi.com',
@@ -40,30 +49,90 @@ export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
     };
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.addEventListener('search-country', debounce(this._searchByCountries.bind(this), 500));
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('search-country', this._searchByCountries);
+
+    super.disconnectedCallback();
+  }
+
+  updated(changedProps: any) {
+    if (changedProps.has('statistics')) {
+      this.statisticsDisplay = JSON.parse(JSON.stringify(this.statistics));
+    }
+  }
+
   firstUpdated() {
-    fetch(new Request(new Request(this.statisticsEndpoint), {
-      headers: this.requestHeaders,
-    }))
-    .then(response => response.json())
-    .then(data => {
-      this.statistics = data;
-    });
+    this._fetchStatistics();
   }
 
   render() {
     return html`
       <main>
         <h1>Covid-19 Tracker</h1>
-        <div>${this.statistics.results} countries</div>
+        <div>
+          ${this.statisticsDisplay.results}
+          ${parseInt(this.statisticsDisplay.results, 10) > 1 ? html`countries` : html`country`}</div>
+        <input-search></input-search>
         <div class="statictics-container">
-          ${this.statistics.response?.map((statistic: any) =>
-            html`
-              <country-information-card .statistic=${statistic}>
-              </country-information-card>
-            `
-          )}
+          ${this.isGetStatisticsLoading ? html`
+          <div class="linear-activity">
+            <div class="indeterminate"></div>
+          </div>
+          ` : html`
+          ${this.statisticsDisplay.response && this.statisticsDisplay.response.length
+            ? html`
+              ${this.statisticsDisplay.response?.map((statistic: any) =>
+                html`
+                  <country-information-card .statistic=${statistic}>
+                  </country-information-card>
+                `
+              )}
+            ` : html`
+                No result found.
+            `}
+          `}
+
         </div>
       </main>
     `;
+  }
+
+  _fetchStatistics() {
+    this.isGetStatisticsLoading = true;
+
+    fetch(new Request(new Request(this.statisticsEndpoint), {
+      headers: this.requestHeaders,
+    }))
+    .then(response => response.json())
+    .then(data => {
+      this.statistics = data;
+    })
+    .finally(() => {
+      this.isGetStatisticsLoading = false;
+    });
+  }
+
+  _searchByCountries(event: any) {
+    const { value } = event.detail.payload;
+
+    if (value) {
+      const regex = new RegExp(`${value.toLowerCase()}*`);
+      const response = this.statistics.response.filter((data: any) =>
+        regex.test(data?.country?.toLowerCase())
+      );
+      
+      this.statisticsDisplay = {
+        results: response.length,
+        response,
+      };
+    } else {
+      this.statisticsDisplay = JSON.parse(JSON.stringify(this.statistics));
+    }
   }
 }

@@ -62,7 +62,7 @@ export const countryInformationCardStyles = css`
         height: 1px;
         background:  #ffffff;
     }
-    
+
     @media (max-width: 1023px) {
         :host {
             flex-basis: 45%;
