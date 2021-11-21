@@ -6,6 +6,7 @@ import { covidTrackerStyles } from './css/covid-tracker.styles';
 
 // components
 import { CountryInformationCard } from './components/country-information-card/CountryInformationCard.js';
+import { WorldWideCases } from './components/world-wide-cases/WorldWideCases.js';
 import { InputSearch } from './components/input-search/InputSearch.js';
 
 export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
@@ -26,6 +27,7 @@ export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
   static get scopedElements() {
     return {
       'country-information-card': CountryInformationCard,
+      'world-wide-cases': WorldWideCases,
       'input-search': InputSearch,
     };
   }
@@ -77,7 +79,9 @@ export class CovidTrackerApp extends ScopedElementsMixin(LitElement) {
         <h1>Covid-19 Tracker</h1>
         <div>
           ${this.statisticsDisplay.results}
-          ${parseInt(this.statisticsDisplay.results, 10) > 1 ? html`countries` : html`country`}</div>
+          ${parseInt(this.statisticsDisplay.results, 10) > 1 ? html`countries` : html`country`}
+        </div>
+        <world-wide-cases .statistics="${this.statisticsDisplay.response}"></world-wide-cases>
         <input-search></input-search>
         <div class="statictics-container">
           ${this.isGetStatisticsLoading ? html`
