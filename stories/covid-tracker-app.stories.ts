@@ -20,8 +20,14 @@ interface ArgTypes {
   backgroundColor?: string;
 }
 
-const Template: Story<ArgTypes> = ({ title, backgroundColor = 'white' }: ArgTypes) => html`
-  <covid-tracker-app style="--covid-tracker-app-background-color: ${backgroundColor}" .title=${title}></covid-tracker-app>
+const Template: Story<ArgTypes> = ({
+  title,
+  backgroundColor = 'white',
+}: ArgTypes) => html`
+  <covid-tracker-app
+    style="--covid-tracker-app-background-color: ${backgroundColor}"
+    .title=${title}
+  ></covid-tracker-app>
 `;
 
 export const App = Template.bind({});

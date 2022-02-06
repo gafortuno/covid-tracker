@@ -4,30 +4,37 @@ import { searchIcon } from '../../svg/search.svg.js';
 
 export class InputSearch extends LitElement {
   static get styles() {
-    return [
-        InputSearchStyles,
-    ];
-  } ;
+    return [InputSearchStyles];
+  }
 
   render() {
     return html`
-        <div class="search-country">
-          ${searchIcon}
-          <input type="text" class="input-search" placeholder="Search country..." @input=${this.searchCountry} />
-        </div>
-        
+      <div class="search-country">
+        ${searchIcon}
+        <input
+          type="text"
+          class="input-search"
+          placeholder="Search country..."
+          @input=${this.searchCountry}
+        />
+      </div>
     `;
   }
 
+  /**
+   * Dispatch event to trigger search by country.
+   */
   searchCountry(event: any) {
-    this.dispatchEvent(new CustomEvent('search-country', {
-      detail: {
-        payload: {
-          value: event.target.value,
-        }
-      },
-      bubbles: true,
-      composed: true,
-    }));
+    this.dispatchEvent(
+      new CustomEvent('search-country', {
+        detail: {
+          payload: {
+            value: event.target.value,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
