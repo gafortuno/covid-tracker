@@ -32,7 +32,6 @@ If you customize the configuration a lot, you can consider moving them to indivi
 Current Progress:![Screen Shot 2021-11-21 at 9 25 38 PM](https://user-images.githubusercontent.com/23646720/142763717-85e13fa6-77c2-42cb-8428-3b49a33c0b72.png)
 
 Pending:
-- Add sort by functionality
-- Add lazy loading
+- Add sort/filter by functionality
 
 
