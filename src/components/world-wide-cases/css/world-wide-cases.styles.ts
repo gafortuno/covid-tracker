@@ -19,4 +19,10 @@ export const WorldWideCasesStyles = css`
     font-size: 12px;
     color: #bdbdbd;
   }
+
+  @media only screen and (max-width: 840px) {
+    :host {
+      flex-direction: column;
+    }
+  }
 `;
